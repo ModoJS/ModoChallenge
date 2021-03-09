@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
-
+const autoIncrement = require('mongoose-auto-increment');
+ 
 const dbConnection = async() =>{
     try{
-        await mongoose.connect(process.env.MONGODB_CNN,{
+        const connection = await mongoose.connect(process.env.MONGODB_CNN,{
             'useNewUrlParser': true,
             'useUnifiedTopology': true,
             'useCreateIndex': true,
@@ -16,4 +17,5 @@ const dbConnection = async() =>{
         throw new Error("Error de conexion a la base de datos");
     }
 }
+
 export default dbConnection;

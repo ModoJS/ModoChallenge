@@ -27,6 +27,7 @@ const cors_1 = __importDefault(require("cors"));
 const AppRouting_1 = require("./routes/AppRouting");
 const swaggerOptions = __importStar(require("../config/swagger.json"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const jwt = require('jsonwebtoken');
 // import swaggerJsDoc from 'swagger-jsdoc';
 // const swaggerJsDoc  = require("swagger-jsdoc");
 class Server {
@@ -47,6 +48,26 @@ class Server {
     middleware() {
         this.app.use(cors_1.default())
             .use(express_1.default.json());
+    }
+    validarJWT(req, res, next) {
+        const token = req.header('x-token');
+        if (!token) {
+            return res.status(404).json({
+                ok: false,
+                msg: "No hay token en la peticion"
+            });
+        }
+        try {
+            const { uid } = jwt.verify(token, process.env.JWT_SECRET);
+            next();
+        }
+        catch (err) {
+            console.log(err);
+            return res.status(401).json({
+                ok: false,
+                msg: "Token no valido "
+            });
+        }
     }
     routes() {
         this.app.use('/api', this.router);

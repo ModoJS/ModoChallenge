@@ -7,9 +7,8 @@ import {Router, Response, Request, NextFunction } from 'express';
      public router: Router = Router();
      public route: string =  '/movement';
 
-    constructor(public MovementService: any , public CardDTO : any) {
-        this.router.get('/', this.getAll);
-        this.router.get('/:movement_id', this.getByNumerId);
+    constructor(public MovementService: any ) {
+        this.router.get('/', this.get);
         this.router.post('/', this.create);
         this.router.delete('/:movement_id', this.deleteByNumberId);
         this.router.put('/:movement_id', this.putByNumberId);
@@ -17,7 +16,7 @@ import {Router, Response, Request, NextFunction } from 'express';
     }
 
     async create(req: Request, res: Response) {
-          const {body} = req
+        const {body} = req
         return await  MovementService.post(body)
         .then((createdEntity) =>{
             return res.status(201).json({
@@ -32,39 +31,26 @@ import {Router, Response, Request, NextFunction } from 'express';
                 });
         });       
     }
-    async getAll(req: Request, res: Response, next: NextFunction) {
-        return await MovementService.getAll()
-        .then((data: any) => {
+    async get(req: Request, res: Response, next: NextFunction) {
+       const query = req.query    
+       console.log(query);
+          
+        return await MovementService.get(query)
+            .then((data: any) => {
+                if(!data){
+                    return res.status(404).json({
+                        ok: true,
+                        payload: "no se encontraron resultados"
+                    });
+
+                }               
                 return res.status(200).json({
                     ok: true,
-                    payload: data
+                    max_id: data[1],
+                    count: data[0].length,
+                    payload: data[0]
                 });
             });
-    }
-    async getByNumerId(req: Request, res: Response, next: NextFunction) {
-        const { number_id } = req.params;
-   
-        return await MovementService.getByNumerId(parseInt(number_id))
-        .then(data =>{
-            if (!data) {
-                return res.status(404).json({
-                    ok: true,
-                    message: 'No se encontraron resultados',
-                    payload: null
-                });               
-            }
-            return res.status(200).json({
-                ok: true,
-                payload: data
-            });
-        }).catch(e => {
-            console.log(e)
-            return res.status(500).json({
-                ok: true,
-                message: 'Errores en el sevidor',
-            }); 
-        });
-      
     }
     async deleteByNumberId(req: Request, res: Response, next: NextFunction) {
         const { movement_id } = req.params;

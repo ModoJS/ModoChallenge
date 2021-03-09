@@ -15,9 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const statement_services_1 = __importDefault(require("../../Services/statement.services"));
 const express_1 = require("express");
 class StatementController {
-    constructor(MovementService, CardDTO) {
+    constructor(MovementService) {
         this.MovementService = MovementService;
-        this.CardDTO = CardDTO;
         this.router = express_1.Router();
         this.route = '/stament';
         this.router.get('/', this.getAll);

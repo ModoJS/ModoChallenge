@@ -10,9 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
 const dbConnection = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose.connect(process.env.MONGODB_CNN, {
+        const connection = yield mongoose.connect(process.env.MONGODB_CNN, {
             'useNewUrlParser': true,
             'useUnifiedTopology': true,
             'useCreateIndex': true,

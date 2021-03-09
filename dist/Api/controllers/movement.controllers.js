@@ -15,13 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const movement_services_1 = __importDefault(require("../../Services/movement.services"));
 const express_1 = require("express");
 class MovementController {
-    constructor(MovementService, CardDTO) {
+    constructor(MovementService) {
         this.MovementService = MovementService;
-        this.CardDTO = CardDTO;
         this.router = express_1.Router();
         this.route = '/movement';
-        this.router.get('/', this.getAll);
-        this.router.get('/:movement_id', this.getByNumerId);
+        this.router.get('/', this.get);
         this.router.post('/', this.create);
         this.router.delete('/:movement_id', this.deleteByNumberId);
         this.router.put('/:movement_id', this.putByNumberId);
@@ -44,38 +42,23 @@ class MovementController {
             });
         });
     }
-    getAll(req, res, next) {
+    get(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield movement_services_1.default.getAll()
+            const query = req.query;
+            console.log(query);
+            return yield movement_services_1.default.get(query)
                 .then((data) => {
-                return res.status(200).json({
-                    ok: true,
-                    payload: data
-                });
-            });
-        });
-    }
-    getByNumerId(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { number_id } = req.params;
-            return yield movement_services_1.default.getByNumerId(parseInt(number_id))
-                .then(data => {
                 if (!data) {
                     return res.status(404).json({
                         ok: true,
-                        message: 'No se encontraron resultados',
-                        payload: null
+                        payload: "no se encontraron resultados"
                     });
                 }
                 return res.status(200).json({
                     ok: true,
-                    payload: data
-                });
-            }).catch(e => {
-                console.log(e);
-                return res.status(500).json({
-                    ok: true,
-                    message: 'Errores en el sevidor',
+                    max_id: data[1],
+                    count: data[0].length,
+                    payload: data[0]
                 });
             });
         });

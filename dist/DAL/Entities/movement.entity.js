@@ -1,11 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var { Schema, model } = require('mongoose');
+var { Schema, model, connection } = require('mongoose');
+var autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(connection);
 const movementSchema = new Schema({
-    movement_id: { type: String, required: [true, 'El id es necesario'] },
+    movement_id: { type: Number, required: [true, 'El id es necesario'] },
     description: { type: String },
     amount: { type: Number },
-    card: { type: Schema.Types.ObjectId, ref: 'card' }
+    fecha: { type: Date },
+    card: { type: Schema.Types.ObjectId, ref: 'card' },
+    increment_id: { type: Number, default: 0, unique: true }
+});
+movementSchema.plugin(autoIncrement.plugin, {
+    model: 'movement',
+    field: 'increment_id',
+    startAt: 1,
+    incrementBy: 1
 });
 exports.default = model('movement', movementSchema);
 //# sourceMappingURL=movement.entity.js.map

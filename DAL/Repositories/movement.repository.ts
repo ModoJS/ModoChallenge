@@ -11,11 +11,7 @@ class MovementRepository implements IRepository{
     }
 
     async Create(movement: movement): Promise<any>{
-        let cards: any[] = [];
-
-
         const newMovement = new Movement(movement);
-
         return await newMovement.save((err: Error, movementSaved: movement) => {
             console.log(err);
             
@@ -24,12 +20,13 @@ class MovementRepository implements IRepository{
         });
     }
     async Retrieve(Expression: any): Promise<any>{
-        return await Movement.find( Expression , (err: Error, movement: movement) => {
+        
+        return await Movement.find(Expression[0], (err: Error, movement: movement) => {
             if (err) {
                 return;
             }
             return movement;
-        });
+        }).populate('card','type brand').limit(Expression[1])
     }    
     async Update(id: any , movement: movement): Promise<boolean> {
         return await Movement.findOne({

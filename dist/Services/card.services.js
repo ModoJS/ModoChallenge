@@ -13,22 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const card_repository_1 = __importDefault(require("../DAL/Repositories/card.repository"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class CardService {
     constructor() {
     }
     post(card) {
         return __awaiter(this, void 0, void 0, function* () {
+            let newNumber_Id = (card.number_id.toString());
+            card.number_id = this.encryptNumber_Id(newNumber_Id);
             return yield card_repository_1.default.Create(card);
         });
     }
-    getAll() {
+    get(expresion) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield card_repository_1.default.Retrieve({});
-        });
-    }
-    getCardByNumerId(number_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield card_repository_1.default.Retrieve({ number_id });
+            let filtro = {};
+            return yield card_repository_1.default.Retrieve(filtro);
         });
     }
     deleteByNumberId(number_id) {
@@ -40,6 +39,10 @@ class CardService {
         return __awaiter(this, void 0, void 0, function* () {
             return yield card_repository_1.default.Update(number_id, card);
         });
+    }
+    encryptNumber_Id(number_id) {
+        let crypt = bcryptjs_1.default.hashSync(number_id.substring(6), 8);
+        return number_id.substring(0, 6) + crypt;
     }
 }
 exports.default = new CardService;

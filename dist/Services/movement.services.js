@@ -21,14 +21,36 @@ class MovementServices {
             return yield movement_repository_1.default.Create(movement);
         });
     }
-    getAll() {
+    get(expresion) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield movement_repository_1.default.Retrieve({});
-        });
-    }
-    getByNumerId(number_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield movement_repository_1.default.Retrieve({ number_id });
+            let filtro = this.Filtro(expresion);
+            let pagination = { increment_id: { $gte: expresion.since_id } };
+            if (expresion.since_id) {
+                filtro = { $and: [pagination, filtro] };
+            }
+            let limit = parseInt(expresion.count) || 0;
+            let newExpression = [filtro, limit];
+            return yield movement_repository_1.default.Retrieve(newExpression)
+                .then(data => {
+                let since = 0;
+                if (data.length > 0) {
+                    since = data[data.length - 1].increment_id;
+                    data = data.map((d) => {
+                        var _a, _b;
+                        return {
+                            "movement_id": d.movement_id,
+                            "description": d.description,
+                            "amount": d.amount,
+                            "fecha": d.fecha,
+                            card: {
+                                "type": (_a = d.card) === null || _a === void 0 ? void 0 : _a.type,
+                                "brand": (_b = d.card) === null || _b === void 0 ? void 0 : _b.brand
+                            }
+                        };
+                    });
+                }
+                return [data, since || 0];
+            });
         });
     }
     deleteByNumberId(number_id) {
@@ -40,6 +62,30 @@ class MovementServices {
         return __awaiter(this, void 0, void 0, function* () {
             return yield movement_repository_1.default.Update(number_id, movement);
         });
+    }
+    Filtro(expresion) {
+        let filtro = {};
+        let hoy = new Date();
+        if (expresion && expresion.movement_id) {
+            filtro = { movement_id: parseInt(expresion.movement_id) };
+        }
+        if (expresion && expresion.fecha) {
+            switch (expresion.fecha) {
+                case 'ultimo dia':
+                    hoy.setDate(hoy.getDate() - 1);
+                    filtro = { "fecha": { "$gte": new Date(hoy) } };
+                    break;
+                case 'ultimos 7 dias':
+                    hoy.setDate(hoy.getDate() - 7);
+                    filtro = { "fecha": { "$gte": new Date(hoy) } };
+                    break;
+                case 'ultimo mes':
+                    hoy.setDate(hoy.getDate() - 30);
+                    filtro = { 'fecha': { '$gte': new Date(hoy) } };
+                    break;
+            }
+        }
+        return filtro;
     }
 }
 exports.default = new MovementServices(movement_repository_1.default);

@@ -1,21 +1,1056 @@
- {
-     "openapi": "3.0.0",
-     "info": {
-         "version": "1.0.0",
-         "title": "Seans-TypeScript-NodeJS-CRUD-REST-API-Boilerplate",
-         "description": "A minimal and easy to follow example of what you need to create a CRUD style API in NodeJs using TypeScript",
-         "license": {
-             "name": "MIT",
-             "url": "https://opensource.org/licenses/MIT"
-         }
-     },
-     "servers": [{
-             "url": "/",
-             "description": "Local Dev, or from Heroku"
-         },
-         {
-             "url": "/api/",
-             "description": "With docker-compose and nginx proxy"
-         }
-     ]
- }
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Modo Challenge",
+        "description": "Api de movimientos de cuentas bancarias",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [{
+        "url": "/api/",
+        "description": "Base url para acceder desde heroku a todos los endpoint"
+    }],
+    "tags": [{
+        "name": "Movimientos de cuentas",
+        "description": "API de movimientos bancarios de un usuario"
+    }],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "tags": [{
+        "name": "Movimientos de cuentas",
+        "description": "API de movimientos bancarios de un usuario"
+    }],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/user": {
+            "post": {
+                "tags": [
+                    "Usuario"
+                ],
+                "summary": "Creación de usuario",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "cuentoso@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario creado para solicitar token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El usuario se ha creado  correctamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+            }
+
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Autenticarse para solicitar el token requerido para en todos enpoint",
+                "requestBody": {
+                    "description": "Login al sistema",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "cuentoso@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token generado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+
+                    },
+                    "400": {
+                        "description": "Error en los datos enviados, password o email no validos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El login no es valido password o email incorrectos."
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements?movement_id={id}": {
+            "parameters": [{
+                "name": "movement_id",
+                "in": "query",
+                "required": true,
+                "description": "Id de los movimientos"
+            }],
+            "get": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Buscar movimientos por Id",
+                "parameters": [{
+                        "in": "query",
+                        "name": "movement_id",
+                        "required": true,
+                        "description": "Id de los movimientos",
+                        "schema": {
+                            "example": "1",
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-token",
+                        "required": true,
+                        "description": "token",
+                        "schema": {
+                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "movimiento por id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "object",
+                                            "properties": {
+                                                "movement_id": {
+                                                    "type": "number",
+                                                    "example": 1
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Tienda online"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "example": 1677
+                                                },
+                                                "fecha": {
+                                                    "type": "date",
+                                                    "example": "2021-03-04T00:52:02.831Z"
+                                                },
+                                                "card": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "example": "Débito"
+                                                        },
+                                                        "brand": {
+                                                            "type": "string",
+                                                            "example": "Visa"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "$ref": "#/definitions/id"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements?fecha={fecha}": {
+            "parameters": [{
+                "name": "fecha",
+                "in": "query",
+                "required": true,
+                "description": "rango de fecha de busqueda"
+            }],
+            "get": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Elegir un rango de fecha",
+                "parameters": [{
+                        "in": "query",
+                        "name": "fecha",
+                        "required": true,
+                        "description": "Estos son los rangos de fechas posibles",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ultimo+dia", "ultimos+7+dias", "ultimo mes"
+                            ],
+
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-token",
+                        "required": true,
+                        "description": "token",
+                        "schema": {
+                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "movimiento por id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "type": "number",
+                                                        "example": 1
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Tienda online"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 1677
+                                                    },
+                                                    "fecha": {
+                                                        "type": "date",
+                                                        "example": "2021-03-04T00:52:02.831Z"
+                                                    },
+                                                    "card": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "Débito"
+                                                            },
+                                                            "brand": {
+                                                                "type": "string",
+                                                                "example": "Visa"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "$ref": "#/definitions/user"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements?&since_id={id}&count={count}": {
+            "parameters": [{
+                "name": "since_id",
+                "in": "query",
+                "required": true,
+                "description": "id incial para la paginaciòn"
+            }, {
+                "name": "count",
+                "in": "query",
+                "required": true,
+                "description": "Cantidad de paginas maxima para la paginaciòn"
+            }],
+            "get": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Elegir un rango de fecha",
+                "parameters": [{
+                        "in": "query",
+                        "name": "since_id",
+                        "required": true,
+                        "description": "Indica de que id comienza a paginar",
+                        "schema": {
+                            "type": "string",
+                            "example": 1,
+                            "$ref": "#/definitions/id"
+                        }
+                    }, {
+                        "in": "query",
+                        "name": "count",
+                        "required": true,
+                        "description": "Indica la cantidad de paginas",
+                        "schema": {
+                            "type": "string",
+                            "example": 3,
+                            "$ref": "#/definitions/id"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-token",
+                        "required": true,
+                        "description": "token",
+                        "schema": {
+                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                            "$ref": "#/definitions/id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "movimiento por id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "max_id": {
+                                            "type": "boolean",
+                                            "example": 3
+                                        },
+                                        "count": {
+                                            "type": "boolean",
+                                            "example": 3
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "movement_id": {
+                                                        "type": "number",
+                                                        "example": 1
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Tienda online"
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "example": 1677
+                                                    },
+                                                    "fecha": {
+                                                        "type": "date",
+                                                        "example": "2021-03-04T00:52:02.831Z"
+                                                    },
+                                                    "card": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string",
+                                                                "example": "Débito"
+                                                            },
+                                                            "brand": {
+                                                                "type": "string",
+                                                                "example": "Visa"
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        },
+                                        "$ref": "#/definitions/user"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements": {
+            "post": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Crear movimiento",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "requestBody": {
+                    "description": "Creación de movimiento",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "movement_id": {
+                                        "type": "integer",
+                                        "example": "234"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Osde binario"
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "example": "5000"
+                                    },
+                                    "fecha": {
+                                        "type": "date",
+                                        "example": "2021-03-04T00:52:02.831Z"
+                                    },
+                                    "card": {
+                                        "type": "string",
+                                        "example": "60457f639a3c5605fc160f41"
+                                    }
+                                },
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Movimientos de usuario creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El movimiento se ha creado  correctamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements{movement_id}": {
+            "delete": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Borrar movimiento",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Movimientos de usuario creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El borrado fue realizado exitosamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El borrado no se pudo realizar"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movements/{movement_id}": {
+            "put": {
+                "tags": [
+                    "Movimientos"
+                ],
+                "summary": "Actualizar movimiento",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Movimientos de usuario actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El actualizado del movimiento fue realizado exitosamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El actualizado del movimiento no se pudo realizar"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/card": {
+            "get": {
+                "tags": [
+                    "Tarjetas"
+                ],
+                "summary": "Buscar todas las tarjetas",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "movimiento por id",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "number_id": {
+                                                        "type": "number",
+                                                        "example": 2342352323
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "Débito"
+                                                    },
+                                                    "brand": {
+                                                        "type": "string",
+                                                        "example": "Mastercard"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "$ref": "#/definitions/user"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/card/": {
+            "post": {
+                "tags": [
+                    "Tarjetas"
+                ],
+                "summary": "Crear tarjeta",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "requestBody": {
+                    "description": "Creación de tarjeta",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "number_id": {
+                                        "type": "integer",
+                                        "example": "2342423423"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "Débito"
+                                    },
+                                    "brand": {
+                                        "type": "string",
+                                        "example": "Visa"
+                                    }
+                                },
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Movimientos de usuario creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El movimiento se ha creado  correctamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "no se encontraron resultados"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/card/{number_id}": {
+            "delete": {
+                "tags": [
+                    "Tarjetas"
+                ],
+                "summary": "Borrar tarjeta por id",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Tarjetas de usuario creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El borrado fue realizado exitosamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El borrado no se pudo realizar"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/card/modificar/{number_id}": {
+            "put": {
+                "tags": [
+                    "Tarjetas"
+                ],
+                "summary": "Actualizar tarjeta por Id",
+                "parameters": [{
+                    "in": "header",
+                    "name": "x-token",
+                    "required": true,
+                    "description": "token",
+                    "schema": {
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2MDQ2NGY1NGUyMjRjMDJhMThlZWQ5MmYiLCJpYXQiOjE2MTUyMjQ3MTAsImV4cCI6MTYxNTI2NzkxMH0.46U86skzXpg5d-X6xuAM_qucUAzmtrrEqxJsRwtudQY",
+                        "$ref": "#/definitions/id"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Movimientos de usuario actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El actualizado de la tarjeta fue realizado exitosamente!!"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/User"
+                                }
+                            }
+                        }
+
+
+                    },
+                    "404": {
+                        "description": "Sin resultados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "payload": {
+                                            "type": "string",
+                                            "example": "El actualizado de la tarjeta no se pudo realizar"
+                                        }
+                                    },
+                                    "$ref": "#/definitions/id"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -15,16 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const card_services_1 = __importDefault(require("../../Services/card.services"));
 const express_1 = require("express");
 class CardController {
-    constructor(CardService, CardDTO) {
+    constructor(CardService) {
         this.CardService = CardService;
-        this.CardDTO = CardDTO;
         this.router = express_1.Router();
         this.route = '/card';
-        this.router.get('/', this.getAll);
-        this.router.get('/:number_id', this.getCardByNumerId);
+        this.router.get('/', this.getCards);
         this.router.post('/', this.create);
         this.router.delete('/:number_id', this.deleteByNumberId);
-        this.router.put('/:number_id', this.putByNumberId);
+        this.router.put('/modificar/:number_id', this.putByNumberId);
     }
     create(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -44,38 +42,14 @@ class CardController {
             });
         });
     }
-    getAll(req, res, next) {
+    getCards(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield card_services_1.default.getAll()
+            const query = req.query;
+            return yield card_services_1.default.get(query)
                 .then((data) => {
                 return res.status(200).json({
                     ok: true,
                     payload: data
-                });
-            });
-        });
-    }
-    getCardByNumerId(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { number_id } = req.params;
-            return yield card_services_1.default.getCardByNumerId(parseInt(number_id))
-                .then(data => {
-                if (!data) {
-                    return res.status(404).json({
-                        ok: true,
-                        message: 'No se encontraron resultados',
-                        payload: null
-                    });
-                }
-                return res.status(200).json({
-                    ok: true,
-                    payload: data
-                });
-            }).catch(e => {
-                console.log(e);
-                return res.status(500).json({
-                    ok: true,
-                    message: 'Errores en el sevidor',
                 });
             });
         });

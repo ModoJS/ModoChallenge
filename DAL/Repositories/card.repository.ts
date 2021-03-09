@@ -2,20 +2,18 @@ import Card from '../Entities/card.entity';
 import { card } from '../models/card.model';
 import IRepository from './IRepository';
 
+
 class CardRepository implements IRepository{
 
+ 
+    
     constructor() {
 
     }
 
     async Create(card: card): Promise<card>{
-        const newCard = new Card({
-            number_id: card.number_id,
-            code_security: card.code_security,
-            owner: card.owner,
-            type: card.type,
-            brand: card.brand
-        });   
+       const newCard = new Card(card);   
+      
        return await newCard.save((err:Error, cardSaved: card) => {   
              if (err) throw err;
             return cardSaved;
@@ -23,10 +21,10 @@ class CardRepository implements IRepository{
     }
     async Retrieve(Expression: any): Promise<any>{
         
-        return await Card.find(Expression, (err: Error, card: card) => {
+        return await Card.find(Expression, (err: Error, card: card[]) => {
             if (err) {
                 return;
-            }           
+            }                
             return card;
         });
     }    
@@ -36,8 +34,6 @@ class CardRepository implements IRepository{
         })
         .then((cardFounded: any) => {  
             if(card.number_id)  cardFounded.number_id = card.number_id; 
-            if(card.code_security)  cardFounded.code_security = card.code_security; 
-            if(card.owner)  cardFounded.owner = card.owner; 
             if(card.type)  cardFounded.type = card.type; 
             if(card.brand) cardFounded.brand = card.brand;     
             

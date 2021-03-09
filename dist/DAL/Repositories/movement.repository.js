@@ -18,7 +18,6 @@ class MovementRepository {
     }
     Create(movement) {
         return __awaiter(this, void 0, void 0, function* () {
-            let cards = [];
             const newMovement = new movement_entity_1.default(movement);
             return yield newMovement.save((err, movementSaved) => {
                 console.log(err);
@@ -30,12 +29,12 @@ class MovementRepository {
     }
     Retrieve(Expression) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield movement_entity_1.default.find(Expression, (err, movement) => {
+            return yield movement_entity_1.default.find(Expression[0], (err, movement) => {
                 if (err) {
                     return;
                 }
                 return movement;
-            });
+            }).populate('card', 'type brand').limit(Expression[1]);
         });
     }
     Update(id, movement) {

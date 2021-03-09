@@ -7,12 +7,11 @@ import {Router, Response, Request, NextFunction } from 'express';
      public router: Router = Router();
      public route: string =  '/card';
 
-    constructor(public CardService: any , public CardDTO : any) {
-        this.router.get('/', this.getAll);
-        this.router.get('/:number_id', this.getCardByNumerId);
+    constructor(public CardService: any) {
+        this.router.get('/', this.getCards);
         this.router.post('/', this.create);
         this.router.delete('/:number_id', this.deleteByNumberId);
-        this.router.put('/:number_id', this.putByNumberId);
+        this.router.put('/modificar/:number_id', this.putByNumberId);
 
     }
 
@@ -32,39 +31,15 @@ import {Router, Response, Request, NextFunction } from 'express';
                 });
         });       
     }
-    async getAll(req: Request, res: Response, next: NextFunction) {
-        return await CardService.getAll()
+    async getCards(req: Request, res: Response, next: NextFunction) {
+        const query = req.query
+        return await CardService.get(query)
         .then((data: any) => {
                 return res.status(200).json({
                     ok: true,
                     payload: data
                 });
             });
-    }
-    async getCardByNumerId(req: Request, res: Response, next: NextFunction) {
-        const { number_id } = req.params;
-   
-        return await CardService.getCardByNumerId(parseInt(number_id))
-        .then(data =>{
-            if (!data) {
-                return res.status(404).json({
-                    ok: true,
-                    message: 'No se encontraron resultados',
-                    payload: null
-                });               
-            }
-            return res.status(200).json({
-                ok: true,
-                payload: data
-            });
-        }).catch(e => {
-            console.log(e)
-            return res.status(500).json({
-                ok: true,
-                message: 'Errores en el sevidor',
-            }); 
-        });
-      
     }
     async deleteByNumberId(req: Request, res: Response, next: NextFunction) {
         const { number_id } = req.params;

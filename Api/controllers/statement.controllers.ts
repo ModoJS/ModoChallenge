@@ -7,7 +7,7 @@ import {Router, Response, Request, NextFunction } from 'express';
      public router: Router = Router();
      public route: string =  '/stament';
 
-    constructor(public MovementService: any , public CardDTO : any) {
+    constructor(public MovementService: any ) {
         this.router.get('/', this.getAll);
         this.router.get('/:id', this.getByNumerId);
         this.router.post('/', this.create);
