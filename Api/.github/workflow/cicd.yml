@@ -1,0 +1,12 @@
+on: push
+name: Ejecutar test y hacer deploy a heroku
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar y moverse a la rama actual
+        uses: actions/checkout@v1
+      - name: Instalar depencias de node
+        run: npm install
+      - name: Ejecutar tests
+        run: npm test
